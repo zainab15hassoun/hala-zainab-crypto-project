@@ -1,3 +1,32 @@
+import base64
+import os
+from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.asymmetric import(
+    dh)
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+
+#generate the p and g
+parameters = dh.generate_parameters(generator=2, key_size=1024)
+
+#private key 
+private_key_Hala = parameters.generate_private_key()
+private_key_Zainab = parameters.generate_private_key()
+print("Private key (Hala):", private_key_Hala.private_numbers())
+print("Private key (Zainab):", private_key_Zainab.private_numbers())
+
+
+#public key 
+public_key_Hala = private_key_Hala.public_key()
+public_key_Zainab = private_key_Zainab.public_key()
+print("Public key (Hala):", public_key_Hala.public_numbers())
+print("Public key (Zainab):", public_key_Zainab.public_numbers())
+
+
+#share key between zainab and Hala
+shared_secret_key = private_key_Hala.exchange(public_key_Zainab)
+print("Shared secret key:", shared_secret_key)
+
 # Encrypt the file using AES-128 in CBC mode 128=16*8
 def encrypt_file(file_path, key):
     aes_key = key[:16]  # Extract 16 bytes for AES-128
