@@ -1,0 +1,37 @@
+# Encrypt the file using AES-128 in CBC mode 128=16*8
+def encrypt_file(file_path, key):
+    aes_key = key[:16]  # Extract 16 bytes for AES-128
+    cipher = AES.new(aes_key, AES.MODE_CBC)
+    iv = cipher.iv  # Generate IV for CBC mode
+    with open(file_path, 'rb') as f:
+        plaintext = f.read()
+    padded_plaintext = pad(plaintext, AES.block_size)
+    ciphertext = cipher.encrypt(padded_plaintext)
+    encrypted_data = iv + ciphertext # iv old cipher text
+    return base64.b64encode(encrypted_data).decode('utf-8')
+
+# Decrypt the file using AES-128 in CBC mode
+def decrypt_file(encrypted_data, key):
+    encrypted_data = base64.b64decode(encrypted_data)  # Decode Base64
+    aes_key = key[:16]  # Extract 16 bytes for AES-128
+    iv = encrypted_data[:AES.block_size]
+    ciphertext = encrypted_data[AES.block_size:]
+    cipher = AES.new(aes_key, AES.MODE_CBC, iv)
+    decrypted_data = unpad(cipher.decrypt(ciphertext), AES.block_size)
+    return decrypted_data
+
+# Simulate file storage transaction from Hala to Zainab
+file_path = "zainab.txt"  # Replace with the actual file path
+encrypted_data = encrypt_file(file_path, shared_secret_key)
+
+# Send encrypted data to Zainab (simulated)
+print(f"Encrypted data: {encrypted_data}")
+
+# Decrypt data on Zainab's side
+decrypted_data = decrypt_file(encrypted_data, shared_secret_key)
+
+# Write decrypted data to a new file
+with open("decrypted_file", "wb") as f:
+     f.write(decrypted_data)
+    
+print (f"decrypted_data: {decrypted_data}")
